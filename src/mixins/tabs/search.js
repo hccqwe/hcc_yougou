@@ -7,19 +7,23 @@ export default class extends wepy.mixin {
         // 搜索历史数据
         keList: [],
         // 控制自动获取焦点
-        // focus: true
+        focus: false,
+        // 没有数据的提示框
+        isOver: false
     }
 
     onLoad() {
         const kwData = wepy.getStorageSync('name') || []
         this.keList = kwData
+
+        this.getSuggestList(this.value)
     }
 
     onShow() {
         const cateData = wepy.getStorageSync('catesList')
         // console.log(cateData)
         this.value = cateData
-
+        this.focus = true;
         this.getSuggestList(this.value)
     }
 
@@ -32,11 +36,13 @@ export default class extends wepy.mixin {
         // 输入框内容发生改变时触发这个函数
         onChange(e) {
             this.value = e.detail.trim()
+            this.isOver = true
             if (e.detail.trim().length <= 0) {
+                this.isOver = false
                 this.suggestList = []
                 return
             }
-            this.getSuggestList(e.detail)
+            this.getSuggestList(this.value)
         },
 
         // 点击搜索按钮会触发这个函数
@@ -109,10 +115,13 @@ export default class extends wepy.mixin {
 
         if (data.meta.status !== 200) {
             // console.log('获取数据失败')
-            return wepy.baseToast()
+            this.isOver = false
+            wepy.baseToast()
+            return 
         }
 
         this.suggestList = data.message
+        this.suggestList.length < 1 && (this.isOver = false);
         this.$apply()
     }
 }

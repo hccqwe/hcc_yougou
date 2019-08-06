@@ -9,6 +9,7 @@
         bind:search="onSearch"
         bind:canCel="onCancel"
         bind:change="onChange"
+        focus="{{focus}}"
       />
     </view>
 
@@ -42,6 +43,12 @@
         >{{item}}</van-tag>
       </view>
     </view>
+
+     <!-- 没有数据提示框 -->
+    <view hidden="{{isOver}}" class="box">
+      <text>对不起亲！暂无数据...</text>
+      <van-icon name="chat-o" />
+    </view>
   </view>
 </template>
 
@@ -67,5 +74,15 @@ export default class extends wepy.page {
 
 .tag {
   margin: 15rpx;
+}
+
+.box {
+  color: #ccc;
+  margin-left: 129rpx;
+  margin-top: 400rpx;
+  font-size: 40rpx;
+  van-icon:nth-child(2) {
+    font-size: 100rpx;
+  }
 }
 </style>
