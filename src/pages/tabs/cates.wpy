@@ -1,0 +1,82 @@
+<template>
+  <view>
+    <!-- 搜索框 -->
+    <view>
+      <van-search
+        value="{{ value }}"
+        placeholder="请输入搜索关键词"
+        show-action
+        bind:search="onSearch"
+        bind:canCel="onCancel"
+        bind:change="onChange"
+        bind:focus="onFocus"
+      />
+    </view>
+    <view class="cates_container">
+      <!-- 左侧滚动视图区域 -->
+      <scroll-view scroll-y style="height: {{wHeight}}px" class="left">
+        <van-badge-group active="{{active}}" bind:change="onChange">
+          <van-badge title="{{item.cat_name}}" wx:for="{{catesList}}" wx:key="index" />
+        </van-badge-group>
+      </scroll-view>
+
+      <!-- 右侧视图滚动区域 -->
+      <scroll-view class="right" scroll-y style="height: {{wHeight}}px">
+        <!-- 循环编辑二级分类 -->
+        <block wx:for="{{secondCate}}" wx:key="index">
+          <van-row>
+            <van-col span="24" style="text-align: center">
+              <text class="cates-title" space="ensp">☛ {{item.cat_name}} ☚</text>
+            </van-col>
+          </van-row>
+
+          <!-- 循环编辑出三级分类 -->
+          <van-row>
+            <block wx:for="{{item.children}}" wx:key="index">
+              <van-col span="8" class="cell" @tap="goGoodsList({{item.cat_id}})">
+                <image src="{{item.cat_icon}}" class="thumbImg" />
+                <view class="thumbTitle">{{item.cat_name}}</view>
+              </van-col>
+            </block>
+          </van-row>
+        </block>
+      </scroll-view>
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import mix from '@/mixins/tabs/cates.js'
+
+export default class extends wepy.page {
+  mixins = [mix]
+}
+</script>
+
+<style lang="less">
+.left {
+  width: 85px;
+}
+.cates_container {
+  display: flex;
+}
+.right {
+  .cates-title {
+    font-size: 30rpx;
+    font-weight: bold;
+    display: inline-block;
+    margin: 30rpx 0;
+  }
+  .cell {
+    text-align: center;
+    .thumbImg {
+      width: 120rpx;
+      height: 120rpx;
+    }
+    .thumbTitle {
+      font-size: 24rpx;
+    }
+  }
+}
+</style>

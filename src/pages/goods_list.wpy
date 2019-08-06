@@ -1,0 +1,76 @@
+<template>
+  <view>
+    <!-- 商品列表区域 -->
+    <block wx:for="{{goodslist}}" wx:key="index">
+      <van-card
+        num="{{item.goods_number}}"
+        price="{{item.goods_price}}"
+        title="{{item.goods_name}}"
+        thumb="{{item.goods_small_logo}}"
+        @tap="goGoodsDetail({{item.goods_id}})"
+      >
+        <view slot="footer" class="btnType">
+          <van-button size="mini" round type="danger">删除</van-button>
+          <van-button size="mini" round type="primary">添加</van-button>
+        </view>
+      </van-card>
+    </block>
+
+    <!-- 提示框 -->
+    <view class="bottomBox" hidden="{{!flag}}">----------我是有底线的----------</view>
+
+    <!-- 没有数据提示框 -->
+    <view hidden="{{isOver}}" class="box">
+      <text>对不起亲！暂无数据...</text>
+      <van-icon name="chat-o" />
+    </view>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import mix from '@/mixins/goods_list.js'
+
+export default class extends wepy.page {
+  config = {
+    navigationBarBackgroundColor: '#50b6bb',
+    navigationBarTitleText: '商品列表',
+    // 上拉触底的距离，默认是 50px
+    onReachBottomDistance: 100,
+    backgroundTextStyle: 'dark',
+    enablePullDownRefresh: true,
+    backgroundColor: '#d7d1c9'
+  }
+  mixins = [mix]
+}
+</script>
+
+<style lang="less">
+.btnType {
+  van-button {
+    margin: 20rpx;
+  }
+}
+
+.van-card {
+  margin-bottom: 15rpx;
+  border-bottom: 1px solid #ccc;
+  padding: 15rpx;
+}
+.bottomBox {
+  font-size: 34rpx;
+  text-align: center;
+  height: 60rpx;
+  line-height: 60rpx;
+  color: #6e9086;
+}
+.box {
+  color: #ccc;
+  margin-left: 129rpx;
+  margin-top: 500rpx;
+  font-size: 40rpx;
+  van-icon:nth-child(2) {
+    font-size: 100rpx;
+  }
+}
+</style>

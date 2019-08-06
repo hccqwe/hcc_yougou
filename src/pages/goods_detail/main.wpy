@@ -1,0 +1,27 @@
+<template>
+    <view>
+        商品详情页
+    </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import mix from '@/mixins/goods_detail/main.js'
+
+export default class extends wepy.page {
+     config = {
+    navigationBarBackgroundColor: '#00a79d',
+    navigationBarTitleText: '商品详情',
+    // 上拉触底的距离，默认是 50px
+    onReachBottomDistance: 100,
+    backgroundTextStyle: 'dark',
+    enablePullDownRefresh: true,
+    backgroundColor: '#d7d1c9'
+  }
+  mixins = [mix]
+}
+</script>
+
+<style lang="less">
+
+</style>

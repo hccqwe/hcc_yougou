@@ -1,0 +1,130 @@
+<style lang="less">
+</style>
+
+<script>
+import wepy from 'wepy'
+import 'wepy-async-function'
+import '@/baseAPI.js'
+
+export default class extends wepy.app {
+  config = {
+    pages: [
+      'pages/tabs/home',
+      'pages/tabs/cates',
+      'pages/tabs/search',
+      'pages/tabs/cart',
+      'pages/tabs/my',
+      // 商品详情页
+      'pages/goods_detail/main',
+      // 商品列表页
+      'pages/goods_list'
+    ],
+    window: {
+      navigationBarBackgroundColor: '#f76262',
+      navigationBarTitleText: '星期五优购',
+      navigationBarTextStyle: 'white'
+    },
+    tabBar: {
+      backgroundColor: '#f9f8eb',
+      borderStyle: 'black',
+      color: '#000',
+      selectedColor: '#f76262',
+      list: [
+        {
+          pagePath: 'pages/tabs/home',
+          text: '首页',
+          iconPath: '/assets/icons/home.png',
+          selectedIconPath: '/assets/icons/home-active.png'
+        },
+        {
+          pagePath: 'pages/tabs/cates',
+          text: '分类',
+          iconPath: '/assets/icons/cates.png',
+          selectedIconPath: '/assets/icons/cates-active.png'
+        },
+        {
+          pagePath: 'pages/tabs/search',
+          text: '搜索',
+          iconPath: '/assets/icons/search.png',
+          selectedIconPath: '/assets/icons/search-active.png'
+        },
+        {
+          pagePath: 'pages/tabs/cart',
+          text: '购物车',
+          iconPath: '/assets/icons/cart.png',
+          selectedIconPath: '/assets/icons/cart-active.png'
+        },
+        {
+          pagePath: 'pages/tabs/my',
+          text: '我的',
+          iconPath: '/assets/icons/my.png',
+          selectedIconPath: '/assets/icons/my-active.png'
+        }
+      ]
+    },
+    usingComponents: {
+      // 徽章组件
+      'van-badge': './assets/vant/badge/index',
+      'van-badge-group': './assets/vant/badge-group/index',
+      // 布局组件
+      'van-row': './assets/vant/row/index',
+      'van-col': './assets/vant/col/index',
+      // 搜索组件
+      'van-search': './assets/vant/search/index',
+      // 单元格组件
+      'van-cell': './assets/vant/cell/index',
+      'van-cell-group': './assets/vant/cell-group/index',
+      // 图标
+      'van-icon': './assets/vant/icon/index',
+      // tag标签页
+      "van-tag": "./assets/vant/tag/index",
+      // 商品卡片
+       "van-card": "./assets/vant/card/index",
+      //  按钮组件
+      "van-button": "./assets/vant/button/index"
+    }
+  }
+
+  globalData = {
+    userInfo: null
+  }
+
+  constructor() {
+    super()
+    this.use('requestfix')
+
+    // 通过这一行代码，可以为异步的API，开启Promise功能，这样，异步API调用的结果，返回值是Promise对象
+    this.use('promisify')
+
+    // 拦截器  拦截request请求
+    this.intercept('request', {
+      // 发出请求时的回调函数
+      config(p) {
+        wepy.showLoading({
+          title: '数据加载中...'
+        })
+        // 必须返回OBJECT参数对象，否则无法发送请求到服务端
+        return p
+      },
+      // 请求成功后的回调函数
+      success(p) {
+        // 必须返回响应数据对象，否则后续无法对响应数据进行处理
+        return p
+      },
+      //请求失败后的回调函数
+      fail(p) {
+        // 必须返回响应数据对象，否则后续无法对响应数据进行处理
+        return p
+      },
+      // 请求完成时的回调函数(请求成功或失败都会被执行)
+      complete(p) {
+        wepy.hideLoading()
+      }
+    })
+  }
+
+  onLaunch() {
+    console.log('小程序启动了')
+  }
+}
+</script>

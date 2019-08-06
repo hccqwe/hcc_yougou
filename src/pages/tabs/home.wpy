@@ -1,0 +1,112 @@
+<template>
+  <view>
+    <!-- 轮播图 start -->
+    <swiper circular autoplay interval="5000" indicator-dots indicator-color>
+      <swiper-item wx:key="index" wx:for="{{swiperList}}">
+        <navigator url="{{item.navigator_url}}" open-type="{{item.open_type}}">
+          <image src="{{item.image_src}}" />
+        </navigator>
+      </swiper-item>
+    </swiper>
+    <!-- 轮播图 stop -->
+
+    <!-- 分页 start -->
+    <view class="cates">
+      <block wx:key="index" wx:for="{{cataList}}">
+        <navigator
+          url="/pages/tabs/cates"
+          open-type="{{item.open_type}}"
+          wx:if="{{item.navigator_url !== undefined}}"
+          hover-class="none"
+        >
+          <image src="{{item.image_src}}" />
+        </navigator>
+
+        <image src="{{item.image_src}}" wx:else />
+      </block>
+    </view>
+    <!-- 分页 stop -->
+
+    <!-- 楼层区域 start -->
+    <view class="floor-container">
+      <view class="floor-item" wx:for="{{floodata}}" wx:key="index">
+        <!-- 楼层的标题 -->
+        <image class="floor-item-title" src="{{item.floor_title.image_src}}" />
+        <!-- 楼层的图片 -->
+        <view class="floor-img-box">
+          <image
+            class="floor-item-pic"
+            wx:for="{{item.product_list}}"
+            wx:key="index"
+            src="{{item.image_src}}"
+            style="width: {{item.image_width}}rpx"
+            @tap="goGoodsList({{item.navigator_url}})"
+          />
+        </view>
+      </view>
+    </view>
+    <!-- 楼层区域 stop -->
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+// 1. 导入外界的 mixin 文件，并接受
+// @ 就代表 src 这一层路径
+import mix from '@/mixins/tabs/home.js'
+
+export default class extends wepy.page {
+  config = {
+    backgroundTextStyle: 'dark',
+    enablePullDownRefresh: true,
+    backgroundColor: '#d7d1c9'
+  }
+  // 2. 把导入的 mix 对象，挂载到 mixins 这个数据中就行
+  mixins = [mix]
+}
+</script>
+
+<style lang="less">
+// 轮播图样式
+swiper {
+  height: 350rpx;
+  navigator,
+  image {
+    height: 100%;
+    width: 750rpx;
+  }
+}
+
+// 分页样式
+.cates {
+  display: flex;
+  justify-content: space-around;
+  margin: 40rpx 0;
+  image {
+    width: 128rpx;
+    height: 140rpx;
+  }
+}
+
+// 楼层区域样式
+.floor-container {
+  .floor-item {
+    .floor-item-title {
+      height: 50rpx;
+      width: 640rpx;
+      display: block;
+    }
+    .floor-img-box {
+      .floor-item-pic {
+        float: left;
+        height: 190rpx;
+        margin: 8rpx;
+        margin-top: 0;
+        &:nth-child(1) {
+          height: 390rpx;
+        }
+      }
+    }
+  }
+}
+</style>
