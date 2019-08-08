@@ -77,16 +77,117 @@ export default class extends wepy.app {
       // 图标
       'van-icon': './assets/vant/icon/index',
       // tag标签页
-      "van-tag": "./assets/vant/tag/index",
+      'van-tag': './assets/vant/tag/index',
       // 商品卡片
-       "van-card": "./assets/vant/card/index",
+      'van-card': './assets/vant/card/index',
       //  按钮组件
-      "van-button": "./assets/vant/button/index"
+      'van-button': './assets/vant/button/index',
+      // tab标签页
+      'van-tab': './assets/vant/tab/index',
+      'van-tabs': './assets/vant/tabs/index',
+      // 把 HTML 代码转换为 WXML 代码的插件
+      wxparse: './assets/wxparse/wxparse',
+      // 商品导航组件
+      'van-goods-action': './assets/vant/goods-action/index',
+      'van-goods-action-icon': './assets/vant/goods-action-icon/index',
+      'van-goods-action-button': './assets/vant/goods-action-button/index',
+      // 步进器
+      'van-stepper': './assets/vant/stepper/index',
+      // 复选框组件
+      'van-checkbox': './assets/vant/checkbox/index',
+      'van-checkbox-group': './assets/vant/checkbox-group/index',
+      // 滑动单元格
+      "van-swipe-cell": "./assets/vant/swipe-cell/index",
+      // 弹出框组件
+      "van-dialog": "./assets/vant/dialog/index"
     }
   }
 
+  // 专门存储全局共享的数据
+  // 只需要通过 this.$parent.globalData 就可以拿到这个全局共享的数据对象
   globalData = {
-    userInfo: null
+    // 全局的购物车列表
+    cartInfo: []
+  }
+
+  // 声明一个全局的函数将页面数据储存到 globalData里面的cartInfo数组里
+  addGoodsToCart(detailsList) {
+    /**
+     * 避免重复添加的矛盾问题 在接受过来数据之前
+     * 将这次出过来的数据 id 与 globalData.cartInfo 里面的id值作比较
+     * 返回两个值 -1或则globalData.cartInfo 里面的id
+     * 如果值为负一说明数组里面已经有了这一次传过来的商品信息
+     * 已经有了商品信息就不用再渲染一个商品信息了，让他的数量加一就行
+     */
+    const newId = this.globalData.cartInfo.findIndex(
+      x => x.id === detailsList.goods_id
+    )
+
+    if (newId !== -1) {
+      this.globalData.cartInfo[newId].count++
+      // 如果数量加一 跟新数据 代用全局函数 持久性存储
+      this.seaveCartStorage()
+      return
+    }
+
+    // push之前筛选出需要的商品信息
+    const info = {
+      // 商品Id
+      id: detailsList.goods_id,
+      // 名称
+      name: detailsList.goods_name,
+      // 图片
+      pic: detailsList.goods_small_logo,
+      // 价格
+      price: detailsList.goods_price,
+      // 数量
+      count: 1,
+      // 是否默认被选中
+      isCheck: true
+    }
+    this.globalData.cartInfo.push(info)
+    // 调用全局函数持久性存储数据
+    this.seaveCartStorage()
+  }
+
+  // 为购物车页面跟新数据公开的全局函数 跟新数量
+  updataCartCount(id, cartCount) {
+    /**
+     * 思路：
+     * 在购物车每次变更数量的时候，调用这个函数，并传递当前 商品的ID和最新数量
+     * 函数接受到这两个参数
+     * 根据传递过来的ID值，去this.$parent.globalData.cartInfo，找到 count这个属性
+     * 将传递过来的最新的 count 赋值给他
+     */
+    const i = this.globalData.cartInfo.findIndex(x => x.id === id)
+    if (i !== -1) {
+      this.globalData.cartInfo[i].count = cartCount
+      // 因为数据发生改变需要持久性保存，所以要调用 seaveCartStorage()函数
+      this.seaveCartStorage()
+    }
+  }
+
+  // 为购物车页面跟新状态公开的全局函数
+  updataCartStatus(id,status) {
+    const i = this.globalData.cartInfo.findIndex(x => x.id === id)
+    if(i !== -1) {
+      this.globalData.cartInfo[i].isCheck = status
+      this.seaveCartStorage()
+    }
+  }
+
+  // 为购物车页面删除数据公开的全局函数
+  removeCartList(id) {
+    const i = this.globalData.cartInfo.findIndex(x => x.id === id)
+    if(i !== -1) {
+      this.globalData.cartInfo.splice(i, 1)
+      this.seaveCartStorage()
+    }
+  }
+
+  // 这个全局函数是将数据持久性存储到storage里面
+  seaveCartStorage() {
+    wepy.setStorageSync('cart', this.globalData.cartInfo)
   }
 
   constructor() {
@@ -124,7 +225,9 @@ export default class extends wepy.app {
   }
 
   onLaunch() {
-    console.log('小程序启动了')
+    // 当小程序启动就从本地存储里面将数据提取出来 并赋值给cart渲染
+    // 但是考虑到用户可能本地存储里面没有 cart 这个数据，判断如果没有返回一个空数组
+    this.globalData.cartInfo = wepy.getStorageSync('cart') || []
   }
 }
 </script>
