@@ -8,7 +8,8 @@ export default class extends wepy.mixin {
         wHeight: 0,
         // 所有二级分类数据
         secondCate: [],
-        value: ''
+        value: '',
+        isDisabled: false
     }
 
     onLoad() {
@@ -20,11 +21,6 @@ export default class extends wepy.mixin {
     }
 
     methods = {
-        onChange(e) {
-            // console.log(e.detail)
-            this.secondCate = this.catesList[e.detail].children
-        },
-
         goGoodsList(id) {
             // console.log(id)
             wepy.navigateTo({
@@ -34,6 +30,7 @@ export default class extends wepy.mixin {
 
         // 搜索框内容发生改变时触发的事件
         onChange(e) {
+
             const newLength = wepy.getStorageSync('length')
             // console.log(e)
             const val = e.detail.trim()
@@ -47,7 +44,7 @@ export default class extends wepy.mixin {
 
                 return
 
-            } else {
+            }else {
 
                 const valOldLength = val.length
                 wepy.setStorageSync('length',valOldLength)

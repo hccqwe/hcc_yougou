@@ -79,7 +79,13 @@
     <!-- 商品导航区域 start -->
     <van-goods-action>
       <van-goods-action-icon icon="chat-o" text="客服" open-type="contact" />
-      <van-goods-action-icon icon="cart-o" text="购物车" url="/pages/tabs/cart" link-type="switchTab" />
+      <van-goods-action-icon
+        icon="cart-o"
+        text="购物车"
+        url="/pages/tabs/cart"
+        link-type="switchTab"
+        info="{{allCount}}"
+      />
       <van-goods-action-button text="加入购物车" type="warning" bind:click="addToCart" />
       <van-goods-action-button text="立即购买" bind:click="onClickButton" />
     </van-goods-action>
@@ -186,7 +192,7 @@ swiper {
       &:nth-child(1) {
         border-right: 1rpx solid #eee;
       }
-       &:nth-last-child(1) {
+      &:nth-last-child(1) {
         border-bottom: 1rpx solid #eee;
       }
     }

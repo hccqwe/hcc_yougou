@@ -17,7 +17,9 @@ export default class extends wepy.app {
       // 商品详情页
       'pages/goods_detail/main',
       // 商品列表页
-      'pages/goods_list'
+      'pages/goods_list',
+      // 商品订单
+      'pages/order'
     ],
     window: {
       navigationBarBackgroundColor: '#f76262',
@@ -97,9 +99,11 @@ export default class extends wepy.app {
       'van-checkbox': './assets/vant/checkbox/index',
       'van-checkbox-group': './assets/vant/checkbox-group/index',
       // 滑动单元格
-      "van-swipe-cell": "./assets/vant/swipe-cell/index",
+      'van-swipe-cell': './assets/vant/swipe-cell/index',
       // 弹出框组件
-      "van-dialog": "./assets/vant/dialog/index"
+      'van-dialog': './assets/vant/dialog/index',
+      // 提交订单栏
+      'van-submit-bar': './assets/vant/submit-bar/index'
     }
   }
 
@@ -107,7 +111,9 @@ export default class extends wepy.app {
   // 只需要通过 this.$parent.globalData 就可以拿到这个全局共享的数据对象
   globalData = {
     // 全局的购物车列表
-    cartInfo: []
+    cartInfo: [],
+    // 全局购物车勾选商品数量
+    allTotal: 0
   }
 
   // 声明一个全局的函数将页面数据储存到 globalData里面的cartInfo数组里
@@ -168,26 +174,61 @@ export default class extends wepy.app {
   }
 
   // 为购物车页面跟新状态公开的全局函数
-  updataCartStatus(id,status) {
+  updataCartStatus(id, status) {
     const i = this.globalData.cartInfo.findIndex(x => x.id === id)
-    if(i !== -1) {
+    if (i !== -1) {
       this.globalData.cartInfo[i].isCheck = status
       this.seaveCartStorage()
     }
   }
 
+  // 统一跟新所有商品的状态公开的全局函数
+  updataAllCartStatus(status) {
+    this.globalData.cartInfo.forEach(x => {
+      x.isCheck = status
+    })
+    this.seaveCartStorage()
+  }
+
   // 为购物车页面删除数据公开的全局函数
   removeCartList(id) {
     const i = this.globalData.cartInfo.findIndex(x => x.id === id)
-    if(i !== -1) {
+    if (i !== -1) {
       this.globalData.cartInfo.splice(i, 1)
       this.seaveCartStorage()
+    }
+  }
+
+  // 计算勾选了的商品总数，渲染徽章
+  async renderCartInfoCount() {
+    let allCount = 0
+    this.globalData.cartInfo.forEach(x => {
+      if (x.isCheck) {
+        allCount += x.count
+      }
+    })
+
+    // 因为部分页面没有 tabBar,会报错，为避免就将这个错误捕获，不让他在页面里报错
+    const res = await wepy
+      .setTabBarBadge({
+        index: 3,
+        text: allCount + ''
+      })
+      .catch(err => err)
+
+    // 将获取到的已勾选的商品数量赋值给全局变量
+    this.globalData.allTotal = allCount
+
+    if (res.errMsg !== 'setTabBarBadge:ok') {
     }
   }
 
   // 这个全局函数是将数据持久性存储到storage里面
   seaveCartStorage() {
     wepy.setStorageSync('cart', this.globalData.cartInfo)
+
+    // 当每次页面变化都要调用 seaveCartStorage() 这个函数，所以在这里面调用渲染徽章函数
+    this.renderCartInfoCount()
   }
 
   constructor() {
@@ -204,6 +245,13 @@ export default class extends wepy.app {
         wepy.showLoading({
           title: '数据加载中...'
         })
+
+        // 自定义请求头
+        p.header = {
+          Authorization: wepy.getStorageSync('token')
+        }
+        // console.log(p)
+
         // 必须返回OBJECT参数对象，否则无法发送请求到服务端
         return p
       },
@@ -228,6 +276,15 @@ export default class extends wepy.app {
     // 当小程序启动就从本地存储里面将数据提取出来 并赋值给cart渲染
     // 但是考虑到用户可能本地存储里面没有 cart 这个数据，判断如果没有返回一个空数组
     this.globalData.cartInfo = wepy.getStorageSync('cart') || []
+
+    // 页面上来调用 wx.setTabBarBadge() 函数，计算商品数量，为 tabBar 某一项的右上角添加文本
+    // wx.setTabBarBadge({
+    //   index: 3,
+    //   text: '999'
+    // })
+
+    // 通过函数调用，计算出所有勾选了的商品的数量
+    this.renderCartInfoCount()
   }
 }
 </script>

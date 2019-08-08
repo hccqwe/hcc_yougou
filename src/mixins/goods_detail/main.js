@@ -82,6 +82,12 @@ export default class testMixin extends wepy.mixin {
       const addr = this.addressList
       const str = addr.provinceName + addr.cityName + addr.countyName + addr.detailInfo
       return str
+    },
+
+    // 调用全局函数，获取到全局商品数量，赋值给购物车图标部分
+    allCount() {
+      // console.log(this.$parent.globalData.allTotal)
+      return this.$parent.globalData.allTotal
     }
   }
 

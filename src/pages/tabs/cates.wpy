@@ -10,6 +10,7 @@
         bind:canCel="onCancel"
         bind:change="onChange"
         bind:focus="onFocus"
+        disabled="{{isDisabled}}"
       />
     </view>
     <view class="cates_container">

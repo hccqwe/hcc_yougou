@@ -33,17 +33,21 @@ export default class testMixin extends wepy.mixin {
 
     // 删除对应的商品
     removeClose(id) {
+      Dialog.alert({
+        title: '温馨提示您！',
+        message: '优购提示：您确定要删除吗？'
+      })
+
       this.cid = id
       this.show = true
     },
 
-    // 点击取消触发的事件
     onClose() {
       wepy.showToast({
         title: '已成功为您取消删除！',
         icon: 'none'
       })
-      Dialog.resetDefaultOptions()
+      this.show = false
     },
 
     // 点击确定触发的事件
@@ -53,7 +57,24 @@ export default class testMixin extends wepy.mixin {
         title: '很抱歉没有取得您的青睐！',
         icon: 'none'
       })
-      Dialog.resetDefaultOptions()
+      this.show = false
+    },
+
+    // 监听全选复选框的选中状态，跟新商品的选中状态
+    onFullhecked(e) {
+     const status = e.detail
+     this.$parent.updataAllCartStatus(status)
+    },
+
+    // 提交订单
+    onOrder() {
+      if(this.amount <= 0) {
+        return wepy.baseToast('订单金额不能为空！')
+      }
+
+      wepy.navigateTo({
+        url: '/pages/order'
+      })
     }
   }
 
@@ -69,6 +90,44 @@ export default class testMixin extends wepy.mixin {
         return true
       }
       return false
+    },
+
+    /**
+     * 计算总价，单位要精确到后两位
+     * 循环遍历所有商品数据，判断 isCheck 是否被选中
+     * 将 isCheck 被选中的那组数据的单价与数量相乘
+     * 最后return出去，组件会自己精确，气门只需要乘以100
+     */
+    amount() {
+      let total = 0
+      this.mycart.forEach(x => {
+        if(x.isCheck) {
+          total += x.price * x.count
+        }
+      })
+
+      return total * 100
+    },
+
+    // 计算所有商品的 选中的数量 与 商品的总数 作比较
+    isFullChecked() {
+      // 商品总数
+      const allCount = this.mycart.length
+
+      // 勾选总数
+      let count = 0    
+      this.mycart.forEach(x => {
+        if(x.isCheck) {
+          // 每次循环到被选中的商品让此变量自加一
+          count++
+        }
+      })
+
+      if(count === allCount) {
+        return true
+      }
+      return false
     }
+
   }
 }

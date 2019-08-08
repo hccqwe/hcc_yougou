@@ -1,11 +1,13 @@
 <template>
   <view>
-    <!-- 空白的购物车 -->
+    <!-- 空白的购物车 start-->
     <view class="empty_cart" wx:if="{{isEmpty}}">
       <image src="/assets/images/cart_empty@2x.png" />
       <view>哎呦，购物车是空的噢~</view>
     </view>
-    <!-- 非空的购物车 -->
+    <!-- 空白的购物车 stop-->
+
+    <!-- 非空的购物车 start-->
     <view class="cart-container" wx:else>
       <!-- 头部单元格 -->
       <van-cell title="我的购物车列表" icon="shop-collect-o" class="cell" />
@@ -36,7 +38,19 @@
           <view slot="right" class="close" @tap="removeClose({{item.id}})">删 除</view>
         </van-swipe-cell>
       </block>
+
+      <!-- 提交订单区域 start -->
+      <van-submit-bar
+        price="{{ amount }}"
+        button-text="提交订单"
+        bind:submit="onOrder"
+        tip="{{false}}"
+      >
+        <van-checkbox value="{{isFullChecked}}" checked-color="#d81e06" bind:change="onFullhecked" class="checked">全选</van-checkbox>
+      </van-submit-bar>
+      <!-- 提交订单区域 stop -->
     </view>
+    <!-- 非空的购物车 stop-->
 
     <!-- 弹出框 -->
     <van-dialog
@@ -47,8 +61,7 @@
       bind:close="onClose"
       bind:confirm="onConfim"
       close-on-click-overlay="true"
-    >
-    </van-dialog>
+    ></van-dialog>
   </view>
 </template>
 
@@ -83,6 +96,9 @@ export default class extends wepy.page {
     width: 180rpx;
     height: 180rpx;
   }
+}
+.cart-container {
+  padding-bottom: 50px;
 }
 .cell {
   font-size: 30rpx;
@@ -130,5 +146,8 @@ export default class extends wepy.page {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.checked {
+  margin-left: 8px;
 }
 </style>
